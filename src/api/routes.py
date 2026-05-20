@@ -23,25 +23,18 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
-# ==========================================================
-# ENDPOINTS DE AUTENTICACIÓN JWT
-# ==========================================================
-
-# 1. [POST] /api/signup - Registrar un nuevo usuario
+# 1. [POST] /api/signup - Registrar nuevo usuario
 @api.route('/signup', methods=['POST'])
 def handle_signup():
     body = request.get_json()
-
-    # Validar que lleguen los campos obligatorios
+   
     if not body or 'email' not in body or 'password' not in body:
         return jsonify({"msg": "El email y la contraseña son obligatorios"}), 400
-
-    # Verificar si el usuario ya existe en la base de datos
+    
     user_exists = User.query.filter_by(email=body['email']).first()
     if user_exists:
         return jsonify({"msg": "El correo electrónico ya está registrado"}), 400
-
-    # Crear el nuevo usuario (por defecto activo/is_active=True)
+    
     new_user = User(
         email=body['email'],
         password=body['password'],
@@ -62,14 +55,14 @@ def handle_login():
     if not body or 'email' not in body or 'password' not in body:
         return jsonify({"msg": "El email y la contraseña son obligatorios"}), 400
 
-    # Buscar al usuario en la base de datos
+    
     user = User.query.filter_by(
         email=body['email'], password=body['password']).first()
 
     if user is None:
         return jsonify({"msg": "Correo electrónico o contraseña incorrectos"}), 401
 
-    # Generar el Token de acceso JWT
+    
     access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
